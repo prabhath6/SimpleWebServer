@@ -41,7 +41,7 @@ class ClientHelper extends Thread{
 
             // TODO
             // add another st.hasMoreElements() in if statement it doesn't work.
-            if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET")) {
+            if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
                 fileName = st.nextToken();
 
             } else if (fileName.length() == 0){
