@@ -12,9 +12,53 @@ class ClientHelper extends Thread{
     // socket to be handled
     Socket cSocket;
 
+    static final String HTML_START =
+            "<html>" +
+                    "<title>HTTP Server in java</title>" +
+                    "<body>";
+
+    static final String HTML_END =
+            "</body>" +
+                    "</html>";
+
     // constructor
     public ClientHelper(Socket s){
         this.cSocket = s;
+    }
+
+    // send file
+    public void sendFile(String fileName, PrintStream out) {
+        try {
+
+            FileInputStream f = new FileInputStream("/Users/prabhath/IdeaProjects/SimpleWebServer/src/index/" + fileName);
+
+            // determine the stream of file we are sending
+            String fileType = "text/plain";
+            if (fileName.endsWith("html") ||  fileName.endsWith("htm")){
+                fileType = "text/html";
+            } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")){
+                fileType = "image/jpeg";
+            } else if (fileName.endsWith("gig")) {
+                fileType = "image/gif";
+            }
+            System.out.println(fileType);
+
+            // print success status
+            out.println("HTTP/1.0 200 OK\\r\\n\"+\n\"Content-type: \"+fileType+\"\\r\\n\\r\\n");
+
+            // send the file contents
+            byte[] buffer = new byte[(int) fileName.length()];
+            int n;
+
+            while((n = f.read(buffer)) > 0){
+                out.write(buffer, 0, n);
+            }
+            // close
+            out.close();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // run
@@ -46,7 +90,7 @@ class ClientHelper extends Thread{
 
             } else if (fileName.length() == 0){
                 // GET request empty then it should return index.html as file name default.
-                fileName = "index.html";
+                fileName = "index/index.html";
             }
 
             // remove leading '/' in request
@@ -65,30 +109,37 @@ class ClientHelper extends Thread{
                 out.close();
             }
 
+            // check for the directory
+            String delims = ".";
+            StringTokenizer folder = new StringTokenizer(fileName, delims);
+            String folderName = folder.nextToken();
+
+            // to check if directory is present or not
+            File[] dirs = new File ("/Users/prabhath/IdeaProjects/SimpleWebServer/src/").listFiles();
+            int count = 0;
+
+            assert dirs != null;
+            for (File a: dirs) {
+                if (a.getName().equals(folderName)) {
+                    count += 1;
+                }
+            }
+
+            if (count == 0) {
+                out.println("No such directory");
+                out.close();
+                return;
+            }
+
             // open file may throw exception
             // to read file
-            FileInputStream f = new FileInputStream("/Users/prabhath/IdeaProjects/SimpleWebServer/src/" + fileName);
+            File[] files = new File("/Users/prabhath/IdeaProjects/SimpleWebServer/src/" + folderName).listFiles();
 
-            // determine the stream of file we are sending
-            String fileType = "text/plain";
-            if (fileName.endsWith("html") ||  fileName.endsWith("htm")){
-                fileType = "text/html";
-            } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")){
-                fileType = "image/jpeg";
-            } else if (fileName.endsWith("gig")) {
-                fileType = "image/gif";
+            assert files != null;
+            for (File a: files){
+                sendFile(a.getName(), out);
             }
 
-            // print success status
-            out.println("HTTP/1.0 200 OK\\r\\n\"+\n\"Content-type: \"+fileType+\"\\r\\n\\r\\n");
-
-            // send the file contents
-            byte[] buffer = new byte[(int) fileName.length()];
-            int n;
-
-            while((n = f.read(buffer)) > 0){
-                out.write(buffer, 0, n);
-            }
             // close
             out.close();
 
@@ -102,7 +153,7 @@ class ClientHelper extends Thread{
 public class webServer {
 
     public static ServerSocket serverSocket;
-    public static final int PORT_NUMBER = 8888;
+    public static final int PORT_NUMBER = 8889;
 
     public static void main(String[] args) {
 
