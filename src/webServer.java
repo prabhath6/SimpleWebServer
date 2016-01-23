@@ -21,6 +21,10 @@ class ClientHelper extends Thread{
             "</body>" +
                     "</html>";
 
+    static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
+
+    String folderName;
+
     // constructor
     public ClientHelper(Socket s){
         this.cSocket = s;
@@ -30,7 +34,7 @@ class ClientHelper extends Thread{
     public void sendFile(String fileName, PrintStream out) {
         try {
 
-            FileInputStream f = new FileInputStream("/Users/prabhath/IdeaProjects/SimpleWebServer/src/index/" + fileName);
+            FileInputStream f = new FileInputStream(BASE_DIR + "/" + folderName + "/" + fileName);
 
             // determine the stream of file we are sending
             String fileType = "text/plain";
@@ -112,10 +116,10 @@ class ClientHelper extends Thread{
             // check for the directory
             String delims = ".";
             StringTokenizer folder = new StringTokenizer(fileName, delims);
-            String folderName = folder.nextToken();
+            folderName = folder.nextToken();
 
             // to check if directory is present or not
-            File[] dirs = new File ("/Users/prabhath/IdeaProjects/SimpleWebServer/src/").listFiles();
+            File[] dirs = new File (BASE_DIR).listFiles();
             int count = 0;
 
             assert dirs != null;
@@ -133,7 +137,7 @@ class ClientHelper extends Thread{
 
             // open file may throw exception
             // to read file
-            File[] files = new File("/Users/prabhath/IdeaProjects/SimpleWebServer/src/" + folderName).listFiles();
+            File[] files = new File(BASE_DIR + folderName).listFiles();
 
             assert files != null;
             for (File a: files){
