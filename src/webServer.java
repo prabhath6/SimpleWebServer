@@ -40,21 +40,43 @@ class ClientHelper extends Thread{
 
     static boolean check_for_file = true;
 
+    static final int TIMEOUT = 10000;
+
     static FileInputStream f;
+
+    String request;
+
+    StringTokenizer st;
+
+    String fileName;
 
 
     // constructor
-    public ClientHelper(Socket s) throws Exception{
+    public ClientHelper(Socket s) {
 
-        this.cSocket = s;
+        try {
 
-        // from socket
-        this.is = s.getInputStream();
-        this.isr = new InputStreamReader(is);
-        this.br = new BufferedReader(isr);
+            this.cSocket = s;
 
-        // to socket
-        this.os = s.getOutputStream();
+            // from socket
+            this.is = s.getInputStream();
+            this.isr = new InputStreamReader(is);
+            this.br = new BufferedReader(isr);
+
+            // to socket
+            this.os = s.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            cSocket.setSoTimeout (TIMEOUT);
+        }
+        catch (SocketException se)
+        {
+            se.printStackTrace();
+        }
 
     }
 
@@ -79,70 +101,76 @@ class ClientHelper extends Thread{
     public void run() {
         try {
 
-            // read the incoming request in the for GET /index.html
-            String request = br.readLine();
-            System.out.println(request);
-
-            // handle request
-            String fileName = "";
-            StringTokenizer st = new StringTokenizer(request);
-
-            if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
-                fileName = st.nextToken();
-            }
-
-            // file name fix
-            if (fileName.equals("/")) {
-                fileName = "index.html";
-            }
-
-            // remove leading '/' in request
-            if (fileName.indexOf("/") == 0) {
-                fileName = fileName.substring(1);
-            }
-
-            // check for illegal file requests
-            if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
-                throw new FileNotFoundException();
-
-            // determine the stream of file we are sending
-            String fileType = "text/plain";
-            if (fileName.endsWith(".html") ||  fileName.endsWith(".htm")){
-                fileType = "text/html";
-            } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")){
-                fileType = "image/jpeg";
-            } else if (fileName.endsWith(".gif")) {
-                fileType = "image/gif";
-            }
-
-            System.out.println(fileType);
-
-            File[] dirs = new File (BASE_DIR + folderName).listFiles();
-            assert dirs != null;
-            for (File a: dirs) {
-                if (!a.canRead()) {
-                    // permission check
-                    check(os, FILE_PERMISSIONS);
-                    return;
-                }
+            try {
+                // read the incoming request in the for GET /index.html
+                request = br.readLine();
+                System.out.println(request);
+            } catch (InterruptedIOException e) {
+                System.out.println("TIMEOUT");
+                cSocket.close();
             }
 
             try {
-                f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
-            } catch (FileNotFoundException e) {
-                check_for_file = false;
-            }
+                // handle request
+                fileName = "";
+                st = new StringTokenizer(request);
 
-            if (check_for_file) {
+                if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
+                    fileName = st.nextToken();
+                }
+
+                // file name fix
+                if (fileName.equals("/")) {
+                    fileName = "index.html";
+                }
+
+                // remove leading '/' in request
+                if (fileName.indexOf("/") == 0) {
+                    fileName = fileName.substring(1);
+                }
+
+                // check for illegal file requests
+                if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
+                    throw new FileNotFoundException();
+
+                // determine the stream of file we are sending
+                String fileType = "text/plain";
+                if (fileName.endsWith(".html") || fileName.endsWith(".htm")) {
+                    fileType = "text/html";
+                } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                    fileType = "image/jpeg";
+                } else if (fileName.endsWith(".gif")) {
+                    fileType = "image/gif";
+                }
+
+                System.out.println(fileType);
+
+                File[] dirs = new File(BASE_DIR + folderName).listFiles();
+                assert dirs != null;
+                for (File a : dirs) {
+                    if (!a.canRead()) {
+                        // permission check
+                        check(os, FILE_PERMISSIONS);
+                        return;
+                    }
+                }
+
+                try {
+                    f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
+                } catch (FileNotFoundException e) {
+                    check_for_file = false;
+                    check(os, FILE_NOT_FOUND);
+                }
+
                 sendFile(f, os);
-            } else {
-                check(os, FILE_NOT_FOUND);
-            }
 
-            // close
-            os.close();
-            br.close();
-            cSocket.close();
+                // close
+                os.close();
+                br.close();
+                cSocket.close();
+            } catch (NullPointerException e) {
+            System.out.println("Connection closed as timeout occurred. ");
+        }
 
         } catch (Exception e) {
             e.printStackTrace();
