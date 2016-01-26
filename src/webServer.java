@@ -11,33 +11,31 @@ class ClientHelper extends Thread{
 
     // socket to be handled
     Socket cSocket;
+
+    // from socket
     InputStream is;
     InputStreamReader isr;
     BufferedReader br;
-    final static String folderName = "index";
+
     // to socket
     OutputStream os;
 
-
+    // path specific
+    final static String folderName = "index";
     static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
 
     // constructor
-    public ClientHelper(Socket s){
+    public ClientHelper(Socket s) throws Exception{
+
         this.cSocket = s;
-        try {
-            this.is = s.getInputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        // from socket
+        this.is = s.getInputStream();
         this.isr = new InputStreamReader(is);
         this.br = new BufferedReader(isr);
 
         // to socket
-        try {
-            this.os = s.getOutputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.os = s.getOutputStream();
 
     }
 
@@ -73,9 +71,6 @@ class ClientHelper extends Thread{
             if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
                 fileName = st.nextToken();
 
-            } else if (fileName.length() == 0){
-                // GET request empty then it should return index.html as file name default.
-                fileName = "index/index.html";
             }
 
             // remove leading '/' in request
@@ -132,7 +127,7 @@ public class webServer {
                 ClientHelper client = new ClientHelper(dataSocket);
                 client.start();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
