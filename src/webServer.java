@@ -2,9 +2,12 @@
  * Created by prabhath on 1/23/16.
  */
 
+import org.omg.CORBA.TIMEOUT;
+
 import java.net.*;
 import java.io.*;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeoutException;
 
 // client helper to handle all the client requests.
 class ClientHelper extends Thread{
@@ -16,6 +19,7 @@ class ClientHelper extends Thread{
     InputStream is;
     InputStreamReader isr;
     BufferedReader br;
+    final static String CRLF = "\r\n";
 
     // to socket
     OutputStream os;
@@ -34,13 +38,11 @@ class ClientHelper extends Thread{
             "</body>" +
                     "</html>";
 
-    static final String FILE_NOT_FOUND = "<H1> HTTP/1.0 404 File Not Found </H!>";
+    static final String FILE_NOT_FOUND = "HTTP/1.0 404 Not Found" + CRLF;
 
     static final String FILE_PERMISSIONS = "<H1> Permission Restricted <H1>";
 
     static boolean check_for_file = true;
-
-    static final int TIMEOUT = 10000;
 
     static FileInputStream f;
 
@@ -69,15 +71,6 @@ class ClientHelper extends Thread{
             e.printStackTrace();
         }
 
-        try
-        {
-            cSocket.setSoTimeout (TIMEOUT);
-        }
-        catch (SocketException se)
-        {
-            se.printStackTrace();
-        }
-
     }
 
     // send file
@@ -101,14 +94,11 @@ class ClientHelper extends Thread{
     public void run() {
         try {
 
-            try {
-                // read the incoming request in the for GET /index.html
-                request = br.readLine();
-                System.out.println(request);
-            } catch (InterruptedIOException e) {
-                System.out.println("TIMEOUT");
-                cSocket.close();
-            }
+
+            // read the incoming request in the for GET /index.html
+            request = br.readLine();
+            System.out.println(request);
+
 
             try {
                 // handle request
@@ -143,6 +133,48 @@ class ClientHelper extends Thread{
                     fileType = "image/gif";
                 }
 
+                String serverLine = "Server: Simple Java Http Server";
+                String statusLine = null;
+                String contentTypeLine = null;
+                String contentLengthLine = "error";
+
+                try {
+                    f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
+                } catch (FileNotFoundException e) {
+                    check_for_file = false;
+                }
+
+                if (check_for_file) {
+                    statusLine = "HTTP/1.0 200 OK" + CRLF;
+                    contentTypeLine = "Content-type: " + fileType
+                            + CRLF;
+                    contentLengthLine = "Content-Length: "
+                            + (new Integer(f.available())).toString() + CRLF;
+                } else {
+                    statusLine = FILE_NOT_FOUND;
+                    contentTypeLine = "text/html\n";
+                    check(os, statusLine);
+                }
+
+                os.write(statusLine.getBytes());
+                System.out.println(statusLine);
+
+                // Send the server line.
+                os.write(serverLine.getBytes());
+                System.out.println(serverLine);
+
+                // Send the content type line.
+                os.write(contentTypeLine.getBytes());
+                System.out.println(contentTypeLine);
+
+                // Send the Content-Length
+                os.write(contentLengthLine.getBytes());
+                System.out.println(contentLengthLine);
+
+                // Send a blank line to indicate the end of the header lines.
+                os.write(CRLF.getBytes());
+                System.out.println(CRLF);
+
                 System.out.println(fileType);
 
                 File[] dirs = new File(BASE_DIR + folderName).listFiles();
@@ -155,13 +187,6 @@ class ClientHelper extends Thread{
                     }
                 }
 
-                try {
-                    f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
-                } catch (FileNotFoundException e) {
-                    check_for_file = false;
-                    check(os, FILE_NOT_FOUND);
-                }
-
                 sendFile(f, os);
 
                 // close
@@ -169,7 +194,7 @@ class ClientHelper extends Thread{
                 br.close();
                 cSocket.close();
             } catch (NullPointerException e) {
-            System.out.println("Connection closed as timeout occurred. ");
+            e.printStackTrace();
         }
 
         } catch (Exception e) {
@@ -182,9 +207,6 @@ class ClientHelper extends Thread{
         String Container = HTML_START + Error +  HTML_END;
         os.write(Container.getBytes());
 
-        os.close();
-        br.close();
-        cSocket.close();
     }
 
 }
@@ -194,6 +216,7 @@ public class webServer {
     public static ServerSocket serverSocket;
     public static Socket dataSocket;
     public static final int PORT_NUMBER = 8889;
+    static final int TIMEOUT = 50000;
 
     public static void main(String[] args) {
 
@@ -201,12 +224,19 @@ public class webServer {
         try {
             System.out.println("Ip: " + InetAddress.getLocalHost());
             serverSocket = new ServerSocket(PORT_NUMBER);
+            serverSocket.setSoTimeout(TIMEOUT);
 
             // loop for clients
             while (true) {
+                try {
 
-                // accept
-                dataSocket = serverSocket.accept();
+                    // accept
+                    dataSocket = serverSocket.accept();
+                } catch (SocketTimeoutException e) {
+                    System.out.println("New Time out");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 // handle client
                 ClientHelper client = new ClientHelper(dataSocket);
