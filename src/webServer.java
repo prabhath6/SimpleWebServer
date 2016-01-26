@@ -38,6 +38,10 @@ class ClientHelper extends Thread{
 
     static final String FILE_PERMISSIONS = "<H1> Permission Restricted <H1>";
 
+    static boolean check_for_file = true;
+
+    static FileInputStream f;
+
 
     // constructor
     public ClientHelper(Socket s) throws Exception{
@@ -113,33 +117,27 @@ class ClientHelper extends Thread{
 
             System.out.println(fileType);
 
-            // check for file
             File[] dirs = new File (BASE_DIR + folderName).listFiles();
-            int count = 0;
-
             assert dirs != null;
             for (File a: dirs) {
-                if (a.getName().equals(fileName)) {
-                    count += 1;
-                }
-
-                // permission check
-                if(!a.canRead()) {
+                if (!a.canRead()) {
+                    // permission check
                     check(os, FILE_PERMISSIONS);
                     return;
                 }
             }
 
-            if (count == 0) {
-
-                check(os, FILE_NOT_FOUND);
-                return;
+            try {
+                f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
+            } catch (FileNotFoundException e) {
+                check_for_file = false;
             }
 
-
-            FileInputStream f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
-
-            sendFile(f, os);
+            if (check_for_file) {
+                sendFile(f, os);
+            } else {
+                check(os, FILE_NOT_FOUND);
+            }
 
             // close
             os.close();
