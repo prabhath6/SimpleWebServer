@@ -23,7 +23,7 @@ class ClientHelper extends Thread{
 
     static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
 
-    String folderName;
+    String folderName = "index";
 
     // constructor
     public ClientHelper(Socket s){
@@ -31,10 +31,10 @@ class ClientHelper extends Thread{
     }
 
     // send file
-    public void sendFile(String fileName, PrintStream out) {
+    public void sendFile(String fileName, OutputStream out) {
         try {
 
-            FileInputStream f = new FileInputStream(BASE_DIR + "/" + folderName + "/" + fileName);
+            FileInputStream f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
 
             // determine the stream of file we are sending
             String fileType = "text/plain";
@@ -48,7 +48,7 @@ class ClientHelper extends Thread{
             System.out.println(fileType);
 
             // print success status
-            out.println("HTTP/1.0 200 OK\\r\\n\"+\n\"Content-type: \"+fileType+\"\\r\\n\\r\\n");
+            //out.println("HTTP/1.0 200 OK\\r\\n\"+\n\"Content-type: \"+fileType+\"\\r\\n\\r\\n");
 
             // send the file contents
             byte[] buffer = new byte[(int) fileName.length()];
@@ -57,8 +57,6 @@ class ClientHelper extends Thread{
             while((n = f.read(buffer)) > 0){
                 out.write(buffer, 0, n);
             }
-            // close
-            out.close();
 
         }catch (Exception e) {
             e.printStackTrace();
@@ -77,7 +75,6 @@ class ClientHelper extends Thread{
 
             // to socket
             OutputStream os = cSocket.getOutputStream();
-            PrintStream out = new PrintStream(os);
 
             // read the incoming request in the for GET /index.html
             String request = br.readLine();
@@ -106,46 +103,12 @@ class ClientHelper extends Thread{
             if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
                 throw new FileNotFoundException();
 
-            // if trailing / is missing error message
-            if (new File(fileName).isDirectory()) {
-                fileName.replace("\\", "/");
-                out.println("HTTP/1.0 301 Moved Permanently\\r\\n\"+\n\"Location: /\"+filename+\"/\\r\\n\\r\\n");
-                out.close();
-            }
+                sendFile(fileName, os);
 
-            // check for the directory
-            String delims = ".";
-            StringTokenizer folder = new StringTokenizer(fileName, delims);
-            folderName = folder.nextToken();
-
-            // to check if directory is present or not
-            File[] dirs = new File (BASE_DIR).listFiles();
-            int count = 0;
-
-            assert dirs != null;
-            for (File a: dirs) {
-                if (a.getName().equals(folderName)) {
-                    count += 1;
-                }
-            }
-
-            if (count == 0) {
-                out.println("No such directory");
-                out.close();
-                return;
-            }
-
-            // open file may throw exception
-            // to read file
-            File[] files = new File(BASE_DIR + folderName).listFiles();
-
-            assert files != null;
-            for (File a: files){
-                sendFile(a.getName(), out);
-            }
 
             // close
-            out.close();
+            os.close();
+            cSocket.close();
 
         } catch (IOException e) {
             e.printStackTrace();
