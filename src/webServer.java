@@ -25,18 +25,18 @@ class ClientHelper extends Thread{
     static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
 
     // html tags
-    String HTML_START =
+    static final String HTML_START =
             "<html>" +
                     "<title>HTTP Server in java</title>" +
                     "<body>";
 
-    String HTML_END =
+    static final String HTML_END =
             "</body>" +
                     "</html>";
 
-    String FILE_NOT_FOUND = "<H1> HTTP/1.0 404 File Not Found </H!>";
+    static final String FILE_NOT_FOUND = "<H1> HTTP/1.0 404 File Not Found </H!>";
 
-    String FILE_PERMISSIONS = "<H1> Permission Restricted <H1>";
+    static final String FILE_PERMISSIONS = "<H1> Permission Restricted <H1>";
 
 
     // constructor
@@ -130,7 +130,6 @@ class ClientHelper extends Thread{
                 }
             }
 
-
             if (count == 0) {
 
                 check(os, FILE_NOT_FOUND);
@@ -147,8 +146,6 @@ class ClientHelper extends Thread{
             br.close();
             cSocket.close();
 
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -169,6 +166,7 @@ class ClientHelper extends Thread{
 public class webServer {
 
     public static ServerSocket serverSocket;
+    public static Socket dataSocket;
     public static final int PORT_NUMBER = 8889;
 
     public static void main(String[] args) {
@@ -180,7 +178,9 @@ public class webServer {
 
             // loop for clients
             while (true) {
-                Socket dataSocket = serverSocket.accept();
+
+                // accept
+                dataSocket = serverSocket.accept();
 
                 // handle client
                 ClientHelper client = new ClientHelper(dataSocket);
