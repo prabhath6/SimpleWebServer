@@ -11,50 +11,45 @@ class ClientHelper extends Thread{
 
     // socket to be handled
     Socket cSocket;
+    InputStream is;
+    InputStreamReader isr;
+    BufferedReader br;
+    final static String folderName = "index";
+    // to socket
+    OutputStream os;
 
-    static final String HTML_START =
-            "<html>" +
-                    "<title>HTTP Server in java</title>" +
-                    "<body>";
-
-    static final String HTML_END =
-            "</body>" +
-                    "</html>";
 
     static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
-
-    String folderName = "index";
 
     // constructor
     public ClientHelper(Socket s){
         this.cSocket = s;
+        try {
+            this.is = s.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.isr = new InputStreamReader(is);
+        this.br = new BufferedReader(isr);
+
+        // to socket
+        try {
+            this.os = s.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     // send file
-    public void sendFile(String fileName, OutputStream out) {
+    public void sendFile(FileInputStream fileName, OutputStream out) {
         try {
 
-            FileInputStream f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
-
-            // determine the stream of file we are sending
-            String fileType = "text/plain";
-            if (fileName.endsWith("html") ||  fileName.endsWith("htm")){
-                fileType = "text/html";
-            } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")){
-                fileType = "image/jpeg";
-            } else if (fileName.endsWith("gig")) {
-                fileType = "image/gif";
-            }
-            System.out.println(fileType);
-
-            // print success status
-            //out.println("HTTP/1.0 200 OK\\r\\n\"+\n\"Content-type: \"+fileType+\"\\r\\n\\r\\n");
-
             // send the file contents
-            byte[] buffer = new byte[(int) fileName.length()];
+            byte[] buffer = new byte[4028];
             int n;
 
-            while((n = f.read(buffer)) > 0){
+            while((n = fileName.read(buffer)) > 0){
                 out.write(buffer, 0, n);
             }
 
@@ -67,15 +62,6 @@ class ClientHelper extends Thread{
     public void run() {
         try {
 
-            // open socket for data transfer
-            // from socket
-            InputStream is = cSocket.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-
-            // to socket
-            OutputStream os = cSocket.getOutputStream();
-
             // read the incoming request in the for GET /index.html
             String request = br.readLine();
             System.out.println(request);
@@ -84,8 +70,6 @@ class ClientHelper extends Thread{
             String fileName = "";
             StringTokenizer st = new StringTokenizer(request);
 
-            // TODO
-            // add another st.hasMoreElements() in if statement it doesn't work.
             if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
                 fileName = st.nextToken();
 
@@ -103,11 +87,23 @@ class ClientHelper extends Thread{
             if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
                 throw new FileNotFoundException();
 
-                sendFile(fileName, os);
+            // determine the stream of file we are sending
+            String fileType = "text/plain";
+            if (fileName.endsWith(".html") ||  fileName.endsWith(".htm")){
+                fileType = "text/html";
+            } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")){
+                fileType = "image/jpeg";
+            } else if (fileName.endsWith(".gif")) {
+                fileType = "image/gif";
+            }
 
+            FileInputStream f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
+
+            sendFile(f, os);
 
             // close
             os.close();
+            br.close();
             cSocket.close();
 
         } catch (IOException e) {
