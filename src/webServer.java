@@ -24,6 +24,21 @@ class ClientHelper extends Thread{
     final static String folderName = "index";
     static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
 
+    // html tags
+    String HTML_START =
+            "<html>" +
+                    "<title>HTTP Server in java</title>" +
+                    "<body>";
+
+    String HTML_END =
+            "</body>" +
+                    "</html>";
+
+    String FILE_NOT_FOUND = "<H1> HTTP/1.0 404 File Not Found </H!>";
+
+    String FILE_PERMISSIONS = "<H1> Permission Restricted <H1>";
+
+
     // constructor
     public ClientHelper(Socket s) throws Exception{
 
@@ -70,7 +85,11 @@ class ClientHelper extends Thread{
 
             if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
                 fileName = st.nextToken();
+            }
 
+            // file name fix
+            if (fileName.equals("/")) {
+                fileName = "index.html";
             }
 
             // remove leading '/' in request
@@ -78,7 +97,7 @@ class ClientHelper extends Thread{
                 fileName = fileName.substring(1);
             }
 
-            // check for illegal file reqursts
+            // check for illegal file requests
             if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
                 throw new FileNotFoundException();
 
@@ -92,6 +111,33 @@ class ClientHelper extends Thread{
                 fileType = "image/gif";
             }
 
+            System.out.println(fileType);
+
+            // check for file
+            File[] dirs = new File (BASE_DIR + folderName).listFiles();
+            int count = 0;
+
+            assert dirs != null;
+            for (File a: dirs) {
+                if (a.getName().equals(fileName)) {
+                    count += 1;
+                }
+
+                // permission check
+                if(!a.canRead()) {
+                    check(os, FILE_PERMISSIONS);
+                    return;
+                }
+            }
+
+
+            if (count == 0) {
+
+                check(os, FILE_NOT_FOUND);
+                return;
+            }
+
+
             FileInputStream f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
 
             sendFile(f, os);
@@ -103,7 +149,19 @@ class ClientHelper extends Thread{
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    public void check(OutputStream os, String Error) throws Exception{
+
+        String Container = HTML_START + Error +  HTML_END;
+        os.write(Container.getBytes());
+
+        os.close();
+        br.close();
+        cSocket.close();
     }
 
 }
@@ -117,6 +175,7 @@ public class webServer {
 
         // create a server socket
         try {
+            System.out.println("Ip: " + InetAddress.getLocalHost());
             serverSocket = new ServerSocket(PORT_NUMBER);
 
             // loop for clients
