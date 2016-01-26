@@ -2,12 +2,10 @@
  * Created by prabhath on 1/23/16.
  */
 
-import org.omg.CORBA.TIMEOUT;
-
 import java.net.*;
 import java.io.*;
 import java.util.StringTokenizer;
-import java.util.concurrent.TimeoutException;
+
 
 // client helper to handle all the client requests.
 class ClientHelper extends Thread{
@@ -153,7 +151,13 @@ class ClientHelper extends Thread{
                 } else {
                     statusLine = FILE_NOT_FOUND;
                     contentTypeLine = "text/html\n";
+                    System.out.println("HTTP/1.0 404 Not Found");
                     check(os, statusLine);
+
+                    // close connection
+                    os.close();
+                    br.close();
+                    cSocket.close();
                 }
 
                 os.write(statusLine.getBytes());
