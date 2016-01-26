@@ -11,54 +11,51 @@ class ClientHelper extends Thread{
 
     // socket to be handled
     Socket cSocket;
+    String folderName;
+    InputStream is;
+    InputStreamReader isr;
+    BufferedReader br;
+    final static String CRLF = "\r\n";
 
-    static final String HTML_START =
-            "<html>" +
-                    "<title>HTTP Server in java</title>" +
-                    "<body>";
+    // to socket
+    OutputStream os;
 
-    static final String HTML_END =
-            "</body>" +
-                    "</html>";
 
     static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
 
-    String folderName;
-
     // constructor
-    public ClientHelper(Socket s){
+    public ClientHelper(Socket s) throws Exception{
         this.cSocket = s;
+        this.is = s.getInputStream();
+        this.isr = new InputStreamReader(is);
+        this.br = new BufferedReader(isr);
+
+        // to socket
+        this.os = s.getOutputStream();
+
     }
 
     // send file
-    public void sendFile(String fileName, PrintStream out) {
+    public void sendFile(FileInputStream fileName, OutputStream os) {
         try {
 
-            FileInputStream f = new FileInputStream(BASE_DIR + "/" + folderName + "/" + fileName);
+            //System.out.println(BASE_DIR + folderName + "/" + fileName);
+            //FileInputStream f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
 
-            // determine the stream of file we are sending
-            String fileType = "text/plain";
-            if (fileName.endsWith("html") ||  fileName.endsWith("htm")){
-                fileType = "text/html";
-            } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")){
-                fileType = "image/jpeg";
-            } else if (fileName.endsWith("gig")) {
-                fileType = "image/gif";
-            }
-            System.out.println(fileType);
+            //System.out.println(fileType);
 
             // print success status
-            out.println("HTTP/1.0 200 OK\\r\\n\"+\n\"Content-type: \"+fileType+\"\\r\\n\\r\\n");
+            //os.println("HTTP/1.0 200 OK\\r\\n\"+\n\"Content-type: \"+fileType+\"\\r\\n\\r\\n");
 
             // send the file contents
-            byte[] buffer = new byte[(int) fileName.length()];
+            byte[] buffer = new byte[1024];//(int) fileName.length()];
             int n;
 
-            while((n = f.read(buffer)) > 0){
-                out.write(buffer, 0, n);
+            while((n = fileName.read(buffer)) != -1){
+                os.write(buffer, 0, n);
             }
             // close
-            out.close();
+            //os.close();
 
         }catch (Exception e) {
             e.printStackTrace();
@@ -69,15 +66,15 @@ class ClientHelper extends Thread{
     public void run() {
         try {
 
-            // open socket for data transfer
-            // from socket
-            InputStream is = cSocket.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
+            process();
 
-            // to socket
-            OutputStream os = cSocket.getOutputStream();
-            PrintStream out = new PrintStream(os);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void process() {
+        try {
 
             // read the incoming request in the for GET /index.html
             String request = br.readLine();
@@ -109,45 +106,103 @@ class ClientHelper extends Thread{
             // if trailing / is missing error message
             if (new File(fileName).isDirectory()) {
                 fileName.replace("\\", "/");
-                out.println("HTTP/1.0 301 Moved Permanently\\r\\n\"+\n\"Location: /\"+filename+\"/\\r\\n\\r\\n");
-                out.close();
+                //out.println("HTTP/1.0 301 Moved Permanently\\r\\n\"+\n\"Location: /\"+filename+\"/\\r\\n\\r\\n");
+                //out.close();
+                os.close();
             }
 
             // check for the directory
-            String delims = ".";
-            StringTokenizer folder = new StringTokenizer(fileName, delims);
-            folderName = folder.nextToken();
+            //String delims = ".";
+            //StringTokenizer folder = new StringTokenizer(fileName, delims);
+            folderName = "index";
 
             // to check if directory is present or not
-            File[] dirs = new File (BASE_DIR).listFiles();
-            int count = 0;
-
-            assert dirs != null;
-            for (File a: dirs) {
-                if (a.getName().equals(folderName)) {
-                    count += 1;
-                }
-            }
-
-            if (count == 0) {
-                out.println("No such directory");
-                out.close();
-                return;
-            }
+//            File[] dirs = new File (BASE_DIR).listFiles();
+//            int count = 0;
+//
+//            assert dirs != null;
+//            for (File a: dirs) {
+//                if (a.getName().equals(folderName)) {
+//                    count += 1;
+//                }
+//            }
+//
+//            if (count == 0) {
+//                //out.println("No such directory");
+//                //out.close();
+//                os.close();
+//                return;
+//            }
 
             // open file may throw exception
             // to read file
             File[] files = new File(BASE_DIR + folderName).listFiles();
 
             assert files != null;
-            for (File a: files){
-                sendFile(a.getName(), out);
+            //System.out.println("filename: " + fileName);
+            boolean fileExists = true;
+            String serverLine = "Server: Simple Java Http Server";
+            String statusLine = null;
+            String contentTypeLine = null;
+            String entityBody = null;
+            String contentLengthLine = "error";
+
+            // determine the stream of file we are sending
+            String fileType = "text/plain";
+            if (fileName.endsWith(".html") ||  fileName.endsWith(".htm")){
+                fileType = "text/html";
+            } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")){
+                fileType = "image/jpeg";
+            } else if (fileName.endsWith(".gif")) {
+                fileType = "image/gif";
             }
 
-            // close
-            out.close();
+            FileInputStream f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
 
-        } catch (IOException e) {
+            if (fileExists) {
+                statusLine = "HTTP/1.0 200 OK" + CRLF;
+                contentTypeLine = "Content-type: " + fileType
+                        + CRLF;
+                contentLengthLine = "Content-Length: "
+                        + (new Integer(f.available())).toString() + CRLF;
+            } else {
+                statusLine = "HTTP/1.0 404 Not Found" + CRLF;
+                contentTypeLine = "text/html";
+                entityBody = "<HTML>"
+                        + "<HEAD><TITLE>404 Not Found</TITLE></HEAD>"
+                        + "<BODY>404 Not Found"
+                        + "<br>usage:http://yourHostName:port/"
+                        + "fileName.html</BODY></HTML>";
+            }
+
+            os.write(statusLine.getBytes());
+            System.out.println(statusLine);
+
+            // Send the server line.
+            os.write(serverLine.getBytes());
+            System.out.println(serverLine);
+
+            // Send the content type line.
+            os.write(contentTypeLine.getBytes());
+            System.out.println(contentTypeLine);
+
+            // Send the Content-Length
+            os.write(contentLengthLine.getBytes());
+            System.out.println(contentLengthLine);
+
+            // Send a blank line to indicate the end of the header lines.
+            os.write(CRLF.getBytes());
+            System.out.println(CRLF);
+
+
+            sendFile(f, os);
+
+            // close
+            os.close();
+            br.close();
+            cSocket.close();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -174,6 +229,8 @@ public class webServer {
                 client.start();
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
