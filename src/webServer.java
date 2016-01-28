@@ -36,9 +36,7 @@ class ClientHelper extends Thread{
 
     static final String FILE_PERMISSIONS = "<H1> Permission Restricted <H1>";
 
-    static boolean check_for_file = true;
     String request;
-    String fileName;
     String folderName;// = "www.scu.edu";
     String BASE_DIR;// = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
 
@@ -96,38 +94,34 @@ class ClientHelper extends Thread{
 
     public void process() throws Exception{
 
-        while (true) {
-
-
             // read the incoming request in the for GET /index.html
-
             request = br.readLine();
             System.out.println(request);
 
-            if (request.equals(CRLF) || request.equals(""))
-                break;
-
+            boolean check_for_file = true;
 
             // handle request
-            //fileName = "";
+            String fileName = "";
             StringTokenizer st = new StringTokenizer(request);
-            String temp = st.nextToken();
+            //String temp = st.nextToken();
 
-            if (temp.equals("GET")) {
+            //if (temp.equals("GET")) {
 
-                fileName = st.nextToken();
-                fileName = "." + fileName;
+              //  fileName = st.nextToken();
+                //fileName = "." + fileName;
 
                 FileInputStream f = null;
 
-//                if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
-//                    fileName = st.nextToken();
-//                }
+                if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
+                    fileName = st.nextToken();
+                }
+                System.out.println("hi: " + fileName);
 
-                // file name fix
-//                if (fileName.equals("/")) {
-//                    fileName = "index.html";
-//                }
+                 //file name fix
+                if (fileName.equals("/")) {
+                    fileName = "index.html";
+                }
+                System.out.println("hi:: " + fileName);
 
                 // remove leading '/' in request
                 if (fileName.indexOf("/") == 0) {
@@ -172,12 +166,7 @@ class ClientHelper extends Thread{
                     statusLine = FILE_NOT_FOUND;
                     contentTypeLine = "text/html";
                     System.out.println("HTTP/1.0 404 Not Found");
-                    entityBody = "<HTML>"
-                            + "<HEAD><TITLE>404 Not Found</TITLE></HEAD>"
-                            + "<BODY>404 Not Found"
-                            + "<br>usage:http://yourHostName:port/"
-                            + "fileName.html</BODY></HTML>";
-                    //check(os, statusLine);
+                    check(os, statusLine);
                 }
 
                 os.write(statusLine.getBytes());
@@ -211,26 +200,29 @@ class ClientHelper extends Thread{
 //                    }
 //                }
 
-                if (check_for_file) {
-                    sendFile(f, os);
-                    f.close();
-                } else {
-                    os.write(entityBody.getBytes());
-                }
-            }
+        if (check_for_file) {
+            sendFile(f, os);
+        } else {
+            check(os, statusLine);
         }
 
 
-            try {
-                // close
-                os.close();
-                br.close();
-                cSocket.close();
-            } catch (NullPointerException e) {
+        try {
+            os.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        try {
+            br.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        try {
+            cSocket.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
     }
 
     public void check(OutputStream os, String Error) throws Exception{
