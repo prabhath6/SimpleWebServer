@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b90bb71f-d88d-42ec-933f-0451220459e1" name="Default" comment="Merge branch 'sendImage' of https://github.com/prabhath6/SimpleWebserServer into multithread&#10;&#10;# Conflicts:&#10;#&#9;src/index/index.html&#10;#&#9;src/webServer.java&#10;">
+    <list default="true" id="b90bb71f-d88d-42ec-933f-0451220459e1" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/institutional-pages/academics/lg-1512-wateranalyzer.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/institutional-pages/homepage/ackerman-andy.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/institutional-pages/homepage/faust-blye.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/institutional-pages/homepage/fung-jonathan.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/institutional-pages/homepage/lg-hollywood.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/institutional-pages/news-ampamp-events/BryanStevenson760480-760x481.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/institutional-pages/news-ampamp-events/brittonschwartz760480-760x479.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/institutional-pages/news-ampamp-events/ontopof760480-760x482.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/public/new/sinskywchild760480.jpg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/css-assets/footer-Santa-Clara-University.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/css-assets/footer-Santa-Clara-University@2x.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/css-assets/footer-The-Jesuit-University-of-Silicon-Valley.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/css-assets/footer-The-Jesuit-University-of-Silicon-Valley@2x.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/css-assets/footer-mission.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/css-assets/footer-mission@2x.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/css-assets/header-large-Santa-Clara-University.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/css-assets/header-small-the-jesuit-university-in-silicon-valley.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/index.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/javascript/search-autocomplete.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/print.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/media/scuedu/style-assets/stylesheets/scu-add.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/www.scu.edu/robots.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/SimpleWebServer/ClientHelper.class" afterPath="$PROJECT_DIR$/out/production/SimpleWebServer/ClientHelper.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/SimpleWebServer/webServer.class" afterPath="$PROJECT_DIR$/out/production/SimpleWebServer/webServer.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -31,8 +53,8 @@
       <file leaf-file-name="webServer.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/webServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.3242009">
-              <caret line="154" column="50" selection-start-line="154" selection-start-column="50" selection-end-line="154" selection-end-column="50" />
+            <state vertical-scroll-proportion="4.954338">
+              <caret line="217" column="37" selection-start-line="217" selection-start-column="37" selection-end-line="217" selection-end-column="37" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
                 <element signature="imports" expanded="true" />
@@ -119,8 +141,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
+      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -155,7 +178,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -165,10 +187,11 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/src/index" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
+    <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/index" />
     </key>
   </component>
@@ -634,6 +657,7 @@
       <workItem from="1453786479987" duration="5153000" />
       <workItem from="1453831731303" duration="3116000" />
       <workItem from="1453836043132" duration="2397000" />
+      <workItem from="1453839082656" duration="1958000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1453570929639</created>
@@ -707,11 +731,17 @@
       <option name="project" value="LOCAL" />
       <updated>1453830779227</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Fixed error reporting.">
+      <created>1453839757944</created>
+      <option name="number" value="00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1453839757944</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="27692000" />
+    <option name="totallyTimeSpent" value="29650000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -724,7 +754,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="4" y="23" width="1265" height="777" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32868218" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -736,7 +766,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32846716" sideWeight="0.49713817" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32766616" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22649223" sideWeight="0.5" order="3" side_tool="true" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22649223" sideWeight="0.5" order="3" side_tool="true" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24938676" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" x="489" y="69" width="303" height="645" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -776,7 +806,8 @@
     <MESSAGE value="Fix the fage not found, permision check, others" />
     <MESSAGE value="General fixes" />
     <MESSAGE value="Fixed file not found and permissions issues" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed file not found and permissions issues" />
+    <MESSAGE value="Fixed error reporting." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed error reporting." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -787,6 +818,25 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/webServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/index/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/webServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -854,8 +904,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/webServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.3242009">
-          <caret line="154" column="50" selection-start-line="154" selection-start-column="50" selection-end-line="154" selection-end-column="50" />
+        <state vertical-scroll-proportion="4.954338">
+          <caret line="217" column="37" selection-start-line="217" selection-start-column="37" selection-end-line="217" selection-end-column="37" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
             <element signature="imports" expanded="true" />

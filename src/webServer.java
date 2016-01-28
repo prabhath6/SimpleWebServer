@@ -2,12 +2,10 @@
  * Created by prabhath on 1/23/16.
  */
 
-import org.omg.CORBA.TIMEOUT;
-
 import java.net.*;
 import java.io.*;
 import java.util.StringTokenizer;
-import java.util.concurrent.TimeoutException;
+
 
 // client helper to handle all the client requests.
 class ClientHelper extends Thread{
@@ -25,7 +23,7 @@ class ClientHelper extends Thread{
     OutputStream os;
 
     // path specific
-    final static String folderName = "index";
+    final static String folderName = "www.scu.edu";
     static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
 
     // html tags
@@ -78,7 +76,7 @@ class ClientHelper extends Thread{
         try {
 
             // send the file contents
-            byte[] buffer = new byte[4028];
+            byte[] buffer = new byte[8156];
             int n;
 
             while((n = fileName.read(buffer)) > 0){
@@ -153,6 +151,7 @@ class ClientHelper extends Thread{
                 } else {
                     statusLine = FILE_NOT_FOUND;
                     contentTypeLine = "text/html\n";
+                    System.out.println("HTTP/1.0 404 Not Found");
                     check(os, statusLine);
                 }
 
@@ -216,7 +215,7 @@ public class webServer {
     public static ServerSocket serverSocket;
     public static Socket dataSocket;
     public static final int PORT_NUMBER = 8889;
-    static final int TIMEOUT = 50000;
+    static final int TIMEOUT = 100000;
 
     public static void main(String[] args) {
 
