@@ -103,25 +103,17 @@ class ClientHelper extends Thread{
             // handle request
             String fileName = "";
             StringTokenizer st = new StringTokenizer(request);
-            //String temp = st.nextToken();
-
-            //if (temp.equals("GET")) {
-
-              //  fileName = st.nextToken();
-                //fileName = "." + fileName;
 
                 FileInputStream f = null;
 
                 if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
                     fileName = st.nextToken();
                 }
-                System.out.println("hi: " + fileName);
 
                  //file name fix
                 if (fileName.equals("/")) {
                     fileName = "index.html";
                 }
-                System.out.println("hi:: " + fileName);
 
                 // remove leading '/' in request
                 if (fileName.indexOf("/") == 0) {
@@ -129,7 +121,8 @@ class ClientHelper extends Thread{
                 }
 
                 // check for illegal file requests
-                //if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
+                if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
+                    check(os, FILE_NOT_FOUND);
 
 
                 // determine the stream of file we are sending
@@ -148,7 +141,6 @@ class ClientHelper extends Thread{
                 String statusLine = null;
                 String contentTypeLine = null;
                 String contentLengthLine = "error";
-                String entityBody = null;
 
                 try {
                     f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
@@ -190,15 +182,15 @@ class ClientHelper extends Thread{
 
                 System.out.println(fileType);
 
-//                File[] dirs = new File(BASE_DIR + folderName).listFiles();
-//                assert dirs != null;
-//                for (File a : dirs) {
-//                    if (!a.canRead()) {
-//                        // permission check
-//                        //check(os, FILE_PERMISSIONS);
-//                        return;
-//                    }
-//                }
+                File[] dirs = new File(BASE_DIR + folderName).listFiles();
+                assert dirs != null;
+                for (File a : dirs) {
+                    if (!a.canRead()) {
+                        // permission check
+                        check(os, FILE_PERMISSIONS);
+                        return;
+                    }
+                }
 
         if (check_for_file) {
             sendFile(f, os);
@@ -248,7 +240,7 @@ public class webServer {
 
             System.out.println("Ip: " + InetAddress.getLocalHost());
             serverSocket = new ServerSocket(PORT_NUMBER);
-            //serverSocket.setSoTimeout(TIMEOUT);
+            serverSocket.setSoTimeout(TIMEOUT);
 
             // path specific
             String folderName = args[2];
@@ -276,4 +268,3 @@ public class webServer {
 
     }
 }
-// 8889 /Users/prabhath/IdeaProjects/SimpleWebServer/src/  www.scu.edu
