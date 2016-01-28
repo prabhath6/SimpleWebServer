@@ -37,17 +37,10 @@ class ClientHelper extends Thread{
     static final String FILE_PERMISSIONS = "<H1> Permission Restricted <H1>";
 
     static boolean check_for_file = true;
-
-    static FileInputStream f;
-
     String request;
-
-    StringTokenizer st;
-
     String fileName;
-
-    String folderName;
-    String BASE_DIR;
+    String folderName;// = "www.scu.edu";
+    String BASE_DIR;// = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
 
 
     // constructor
@@ -58,16 +51,17 @@ class ClientHelper extends Thread{
             this.cSocket = s;
 
             // from socket
-            this.is = s.getInputStream();
+            this.is = cSocket.getInputStream();
             this.isr = new InputStreamReader(is);
             this.br = new BufferedReader(isr);
 
             // to socket
-            this.os = s.getOutputStream();
+            this.os = cSocket.getOutputStream();
 
             // path specific
             this.folderName = folderName;
             this.BASE_DIR = BASE_DIR;
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,10 +73,10 @@ class ClientHelper extends Thread{
         try {
 
             // send the file contents
-            byte[] buffer = new byte[8156];
+            byte[] buffer = new byte[1024];
             int n;
 
-            while((n = fileName.read(buffer)) > 0){
+            while((n = fileName.read(buffer)) != -1){
                 out.write(buffer, 0, n);
             }
 
@@ -94,26 +88,46 @@ class ClientHelper extends Thread{
     // run
     public void run() {
         try {
+            process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void process() throws Exception{
+
+        while (true) {
 
 
             // read the incoming request in the for GET /index.html
+
             request = br.readLine();
             System.out.println(request);
 
+            if (request.equals(CRLF) || request.equals(""))
+                break;
 
-            try {
-                // handle request
-                fileName = "";
-                st = new StringTokenizer(request);
 
-                if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
-                    fileName = st.nextToken();
-                }
+            // handle request
+            //fileName = "";
+            StringTokenizer st = new StringTokenizer(request);
+            String temp = st.nextToken();
+
+            if (temp.equals("GET")) {
+
+                fileName = st.nextToken();
+                fileName = "." + fileName;
+
+                FileInputStream f = null;
+
+//                if (st.hasMoreElements() && st.nextToken().equalsIgnoreCase("GET") && st.hasMoreElements()) {
+//                    fileName = st.nextToken();
+//                }
 
                 // file name fix
-                if (fileName.equals("/")) {
-                    fileName = "index.html";
-                }
+//                if (fileName.equals("/")) {
+//                    fileName = "index.html";
+//                }
 
                 // remove leading '/' in request
                 if (fileName.indexOf("/") == 0) {
@@ -121,41 +135,49 @@ class ClientHelper extends Thread{
                 }
 
                 // check for illegal file requests
-                if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
-                    throw new FileNotFoundException();
+                //if (fileName.contains("..") || fileName.contains(":") || fileName.contains("|"))
+
 
                 // determine the stream of file we are sending
-                String fileType = "text/plain";
-                if (fileName.endsWith(".html") || fileName.endsWith(".htm")) {
+                String fileType ;//= "text/plain";
+                if (fileName.endsWith(".html") || fileName.endsWith(".htm") || fileName.endsWith(".txt")) {
                     fileType = "text/html";
                 } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
                     fileType = "image/jpeg";
                 } else if (fileName.endsWith(".gif")) {
                     fileType = "image/gif";
+                } else {
+                    fileType = "application/octet-stream";
                 }
 
                 String serverLine = "Server: Simple Java Http Server";
                 String statusLine = null;
                 String contentTypeLine = null;
                 String contentLengthLine = "error";
+                String entityBody = null;
 
                 try {
                     f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
                 } catch (FileNotFoundException e) {
                     check_for_file = false;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
                 if (check_for_file) {
                     statusLine = "HTTP/1.0 200 OK" + CRLF;
-                    contentTypeLine = "Content-type: " + fileType
-                            + CRLF;
-                    contentLengthLine = "Content-Length: "
-                            + (new Integer(f.available())).toString() + CRLF;
+                    contentTypeLine = "Content-type: " + fileType + CRLF;
+                    contentLengthLine = "Content-Length: " + (new Integer(f.available())).toString() + CRLF;
                 } else {
                     statusLine = FILE_NOT_FOUND;
-                    contentTypeLine = "text/html\n";
+                    contentTypeLine = "text/html";
                     System.out.println("HTTP/1.0 404 Not Found");
-                    check(os, statusLine);
+                    entityBody = "<HTML>"
+                            + "<HEAD><TITLE>404 Not Found</TITLE></HEAD>"
+                            + "<BODY>404 Not Found"
+                            + "<br>usage:http://yourHostName:port/"
+                            + "fileName.html</BODY></HTML>";
+                    //check(os, statusLine);
                 }
 
                 os.write(statusLine.getBytes());
@@ -179,29 +201,36 @@ class ClientHelper extends Thread{
 
                 System.out.println(fileType);
 
-                File[] dirs = new File(BASE_DIR + folderName).listFiles();
-                assert dirs != null;
-                for (File a : dirs) {
-                    if (!a.canRead()) {
-                        // permission check
-                        check(os, FILE_PERMISSIONS);
-                        return;
-                    }
+//                File[] dirs = new File(BASE_DIR + folderName).listFiles();
+//                assert dirs != null;
+//                for (File a : dirs) {
+//                    if (!a.canRead()) {
+//                        // permission check
+//                        //check(os, FILE_PERMISSIONS);
+//                        return;
+//                    }
+//                }
+
+                if (check_for_file) {
+                    sendFile(f, os);
+                    f.close();
+                } else {
+                    os.write(entityBody.getBytes());
                 }
+            }
+        }
 
-                sendFile(f, os);
 
+            try {
                 // close
                 os.close();
                 br.close();
                 cSocket.close();
             } catch (NullPointerException e) {
 
-        }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     public void check(OutputStream os, String Error) throws Exception{
@@ -217,7 +246,7 @@ public class webServer {
 
     public static ServerSocket serverSocket;
     public static Socket dataSocket;
-    static final int TIMEOUT = 10000;
+    static final int TIMEOUT = 15000;
 
     public static void main(String[] args) {
 
@@ -227,7 +256,7 @@ public class webServer {
 
             System.out.println("Ip: " + InetAddress.getLocalHost());
             serverSocket = new ServerSocket(PORT_NUMBER);
-            serverSocket.setSoTimeout(TIMEOUT);
+            //serverSocket.setSoTimeout(TIMEOUT);
 
             // path specific
             String folderName = args[2];
