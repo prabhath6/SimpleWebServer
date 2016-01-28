@@ -22,10 +22,6 @@ class ClientHelper extends Thread{
     // to socket
     OutputStream os;
 
-    // path specific
-    final static String folderName = "www.scu.edu";
-    static final String BASE_DIR = "/Users/prabhath/IdeaProjects/SimpleWebServer/src/";
-
     // html tags
     static final String HTML_START =
             "<html>" +
@@ -50,9 +46,12 @@ class ClientHelper extends Thread{
 
     String fileName;
 
+    String folderName;
+    String BASE_DIR;
+
 
     // constructor
-    public ClientHelper(Socket s) {
+    public ClientHelper(Socket s, String BASE_DIR, String folderName) {
 
         try {
 
@@ -65,6 +64,10 @@ class ClientHelper extends Thread{
 
             // to socket
             this.os = s.getOutputStream();
+
+            // path specific
+            this.folderName = folderName;
+            this.BASE_DIR = BASE_DIR;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -193,7 +196,7 @@ class ClientHelper extends Thread{
                 br.close();
                 cSocket.close();
             } catch (NullPointerException e) {
-            e.printStackTrace();
+
         }
 
         } catch (Exception e) {
@@ -214,16 +217,21 @@ public class webServer {
 
     public static ServerSocket serverSocket;
     public static Socket dataSocket;
-    public static final int PORT_NUMBER = 8889;
-    static final int TIMEOUT = 100000;
+    static final int TIMEOUT = 10000;
 
     public static void main(String[] args) {
 
         // create a server socket
+        final int PORT_NUMBER = Integer.parseInt(args[0]);
         try {
+
             System.out.println("Ip: " + InetAddress.getLocalHost());
             serverSocket = new ServerSocket(PORT_NUMBER);
             serverSocket.setSoTimeout(TIMEOUT);
+
+            // path specific
+            String folderName = args[2];
+            String BASE_DIR = args[1];
 
             // loop for clients
             while (true) {
@@ -238,7 +246,7 @@ public class webServer {
                 }
 
                 // handle client
-                ClientHelper client = new ClientHelper(dataSocket);
+                ClientHelper client = new ClientHelper(dataSocket, BASE_DIR, folderName);
                 client.start();
             }
         } catch (Exception e) {
@@ -247,3 +255,4 @@ public class webServer {
 
     }
 }
+// 8889 /Users/prabhath/IdeaProjects/SimpleWebServer/src/  www.scu.edu
