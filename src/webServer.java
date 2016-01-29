@@ -4,6 +4,9 @@
 
 import java.net.*;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 
@@ -34,7 +37,7 @@ class ClientHelper extends Thread{
 
     static final String FILE_NOT_FOUND = "HTTP/1.0 404 Not Found" + CRLF;
 
-    static final String FILE_PERMISSIONS = "<H1> Permission Restricted <H1>";
+    static final String FILE_PERMISSIONS = "<H1> HTTP/1.0 403 Permission Restricted <H1>";
 
     String request;
     String folderName;// = "www.scu.edu";
@@ -60,9 +63,12 @@ class ClientHelper extends Thread{
             this.folderName = folderName;
             this.BASE_DIR = BASE_DIR;
 
+        } catch (NullPointerException e) {
+            System.out.println();
+        } catch (SocketException e) {
+            System.out.println();
         } catch (IOException e) {
-            e.printStackTrace();
-        }
+        e.printStackTrace();}
 
     }
 
@@ -88,7 +94,7 @@ class ClientHelper extends Thread{
         try {
             process();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Socket closed");
         }
     }
 
@@ -142,6 +148,11 @@ class ClientHelper extends Thread{
                 String contentTypeLine = null;
                 String contentLengthLine = "error";
 
+                // date
+                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date date = new Date();
+                String today = dateFormat.format(date) + CRLF;
+
                 try {
                     f = new FileInputStream(BASE_DIR + folderName + "/" + fileName);
                 } catch (FileNotFoundException e) {
@@ -164,6 +175,10 @@ class ClientHelper extends Thread{
                 os.write(statusLine.getBytes());
                 System.out.println(statusLine);
 
+                // date
+                os.write(today.getBytes());
+                System.out.println(today);
+
                 // Send the server line.
                 os.write(serverLine.getBytes());
                 System.out.println(serverLine);
@@ -175,6 +190,9 @@ class ClientHelper extends Thread{
                 // Send the Content-Length
                 os.write(contentLengthLine.getBytes());
                 System.out.println(contentLengthLine);
+
+                // today's date
+
 
                 // Send a blank line to indicate the end of the header lines.
                 os.write(CRLF.getBytes());
@@ -230,7 +248,7 @@ public class webServer {
 
     public static ServerSocket serverSocket;
     public static Socket dataSocket;
-    static final int TIMEOUT = 15000;
+    static final int TIMEOUT = 10000;
 
     public static void main(String[] args) {
 
@@ -239,6 +257,7 @@ public class webServer {
         try {
 
             System.out.println("Ip: " + InetAddress.getLocalHost());
+            System.out.println("Port Number" + PORT_NUMBER);
             serverSocket = new ServerSocket(PORT_NUMBER);
             serverSocket.setSoTimeout(TIMEOUT);
 
@@ -253,7 +272,7 @@ public class webServer {
                     // accept
                     dataSocket = serverSocket.accept();
                 } catch (SocketTimeoutException e) {
-                    System.out.println("New Time out");
+                    System.out.println("\nNew Time out");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

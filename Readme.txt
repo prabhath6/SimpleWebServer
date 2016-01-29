@@ -16,5 +16,5 @@ Instructions for running your program : webServer portNumber path folderName
 (Example: java webServer 8889 /User/desktop/site/ www.scu.edu)
 
 Any other information you want us to know : When the first connection is made and if the server did not receive any
-request from clients then after 10 seconds it throws error and terminates, if even one connection is made it transfer
-files and then terminate the socket but not the connection.
+request from clients then after 10 seconds it terminate the socket, you can see when the soccket is terminated it prints
+socket terminated in the console
